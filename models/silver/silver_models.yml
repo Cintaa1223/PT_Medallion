@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: silver_customer
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+
+  - name: silver_orders
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - not_null
+
+  - name: silver_lineitem
+    tests:
+      - unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - order_id
+              - line_number
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+      - name: line_number
+        tests:
+          - not_null
+
+  - name: silver_nation
+    columns:
+      - name: nation_id
+        tests:
+          - unique
+          - not_null
+
+  - name: silver_region
+    columns:
+      - name: region_id
+        tests:
+          - unique
+          - not_null
