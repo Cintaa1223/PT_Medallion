@@ -1,0 +1,90 @@
+table gold_dim_date
+	lineageTag: acaf6ebe-fbea-44f7-ab17-64a2c166d670
+
+	column DATE_ID
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4381161f-f6a6-4512-ab5d-1c4af933fc94
+		summarizeBy: none
+		sourceColumn: DATE_ID
+
+		variation Variación
+			isDefault
+			relationship: 6c88481f-ac27-405b-8199-6afdef28abe7
+			defaultHierarchy: LocalDateTable_3324bc05-8c75-4df1-a60e-5fd0984429ca.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column YEAR
+		dataType: int64
+		formatString: 0
+		lineageTag: cccdd387-7d2a-4eed-ae4f-8f9ee55f152b
+		summarizeBy: sum
+		sourceColumn: YEAR
+
+		annotation SummarizationSetBy = Automatic
+
+	column QUARTER
+		dataType: int64
+		formatString: 0
+		lineageTag: adaf658b-2e0b-448d-b039-014e6749b3aa
+		summarizeBy: sum
+		sourceColumn: QUARTER
+
+		annotation SummarizationSetBy = Automatic
+
+	column MONTH
+		dataType: int64
+		formatString: 0
+		lineageTag: 0529a198-baba-4571-befa-bd7739532241
+		summarizeBy: sum
+		sourceColumn: MONTH
+
+		annotation SummarizationSetBy = Automatic
+
+	column MONTH_NAME
+		dataType: string
+		lineageTag: 4aadd3d1-674a-4eee-92e0-868c8e5a15b2
+		summarizeBy: none
+		sourceColumn: MONTH_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column DAY_OF_MONTH
+		dataType: int64
+		formatString: 0
+		lineageTag: d8e103d4-8d5e-420a-bc11-84396fc8597e
+		summarizeBy: sum
+		sourceColumn: DAY_OF_MONTH
+
+		annotation SummarizationSetBy = Automatic
+
+	column DAY_OF_WEEK
+		dataType: int64
+		formatString: 0
+		lineageTag: 3ea1edc3-e23c-4226-8cc6-eb6be33b51ac
+		summarizeBy: sum
+		sourceColumn: DAY_OF_WEEK
+
+		annotation SummarizationSetBy = Automatic
+
+	column DAY_NAME
+		dataType: string
+		lineageTag: 0e757f7a-997a-463e-b8e6-68bac55ff0bc
+		summarizeBy: none
+		sourceColumn: DAY_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	partition gold_dim_date = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents("C:\Users\A200256158\Downloads\gold_dim_date.csv"),[Delimiter=",", Columns=8, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(Origen, [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"DATE_ID", type datetime}, {"YEAR", Int64.Type}, {"QUARTER", Int64.Type}, {"MONTH", Int64.Type}, {"MONTH_NAME", type text}, {"DAY_OF_MONTH", Int64.Type}, {"DAY_OF_WEEK", Int64.Type}, {"DAY_NAME", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,23 @@
+model Model
+	culture: es-ES
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-ES
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["gold_fact_sales","gold_dim_date","gold_dim_customer"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table gold_fact_sales
+ref table DateTableTemplate_225f35f2-88a6-4562-b4b5-e575c2f7bc59
+ref table gold_dim_date
+ref table LocalDateTable_3324bc05-8c75-4df1-a60e-5fd0984429ca
+ref table gold_dim_customer
+
+ref cultureInfo es-ES
+

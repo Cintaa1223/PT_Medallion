@@ -1,0 +1,141 @@
+table gold_fact_sales
+	lineageTag: 862bbdcf-9821-4b0a-8f97-32f43bebe806
+
+	column ORDER_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 12ebab49-a936-4e1b-8067-b9a643f0ebb5
+		summarizeBy: count
+		sourceColumn: ORDER_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column LINE_NUMBER
+		dataType: int64
+		formatString: 0
+		lineageTag: 63d448de-8eb4-438d-aa17-ba3470eb0f22
+		summarizeBy: sum
+		sourceColumn: LINE_NUMBER
+
+		annotation SummarizationSetBy = Automatic
+
+	column CUSTOMER_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 4d3b2c08-74a3-43bf-a389-dece74a202a3
+		summarizeBy: none
+		sourceColumn: CUSTOMER_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column DATE_ID
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0ba19128-0de5-416b-810f-e5ac4522c039
+		summarizeBy: none
+		sourceColumn: DATE_ID
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PART_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: bc96f321-1bae-4b22-8fbd-cdef76551bb8
+		summarizeBy: count
+		sourceColumn: PART_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column SUPPLIER_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 36e2ee9d-e453-4ba2-8ccb-3e19f5f88c46
+		summarizeBy: count
+		sourceColumn: SUPPLIER_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column QUANTITY
+		dataType: int64
+		formatString: 0
+		lineageTag: e7c58487-9274-4b7a-a88a-d1e2406f6227
+		summarizeBy: sum
+		sourceColumn: QUANTITY
+
+		annotation SummarizationSetBy = Automatic
+
+	column EXTENDED_PRICE
+		dataType: int64
+		formatString: 0
+		lineageTag: cf15ed98-ce08-4b2b-88d1-07901190de63
+		summarizeBy: sum
+		sourceColumn: EXTENDED_PRICE
+
+		annotation SummarizationSetBy = Automatic
+
+	column DISCOUNT
+		dataType: int64
+		formatString: 0
+		lineageTag: cc053dd8-48f4-42e5-984d-814b735e019f
+		summarizeBy: sum
+		sourceColumn: DISCOUNT
+
+		annotation SummarizationSetBy = Automatic
+
+	column TAX
+		dataType: int64
+		formatString: 0
+		lineageTag: 75c1415e-a92f-4460-9415-d2666db26c73
+		summarizeBy: sum
+		sourceColumn: TAX
+
+		annotation SummarizationSetBy = Automatic
+
+	column NET_REVENUE
+		dataType: int64
+		formatString: 0
+		lineageTag: 9b8acfc4-d17d-4b9a-a913-db6d4c2fa656
+		summarizeBy: sum
+		sourceColumn: NET_REVENUE
+
+		annotation SummarizationSetBy = Automatic
+
+	column GROSS_REVENUE
+		dataType: int64
+		formatString: 0
+		lineageTag: d99349be-0f00-4ff0-95a0-a6fd751c475d
+		summarizeBy: sum
+		sourceColumn: GROSS_REVENUE
+
+		annotation SummarizationSetBy = Automatic
+
+	column RETURN_FLAG
+		dataType: string
+		lineageTag: c26675e7-f3e1-452b-8329-4edb24cff99d
+		summarizeBy: none
+		sourceColumn: RETURN_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column LINE_STATUS
+		dataType: string
+		lineageTag: b3df1d73-2d85-4b67-8bb6-9eb166ae2345
+		summarizeBy: none
+		sourceColumn: LINE_STATUS
+
+		annotation SummarizationSetBy = Automatic
+
+	partition gold_fact_sales = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents("C:\Users\A200256158\Downloads\gold_fact_sales.csv"),[Delimiter=",", Columns=14, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(Origen, [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"ORDER_ID", Int64.Type}, {"LINE_NUMBER", Int64.Type}, {"CUSTOMER_ID", Int64.Type}, {"DATE_ID", type date}, {"PART_ID", Int64.Type}, {"SUPPLIER_ID", Int64.Type}, {"QUANTITY", Int64.Type}, {"EXTENDED_PRICE", Int64.Type}, {"DISCOUNT", Int64.Type}, {"TAX", Int64.Type}, {"NET_REVENUE", Int64.Type}, {"GROSS_REVENUE", Int64.Type}, {"RETURN_FLAG", type text}, {"LINE_STATUS", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+

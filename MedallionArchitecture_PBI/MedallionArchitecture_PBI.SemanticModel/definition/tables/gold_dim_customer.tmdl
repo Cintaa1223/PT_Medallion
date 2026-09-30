@@ -1,0 +1,99 @@
+table gold_dim_customer
+	lineageTag: de147062-b028-4119-b813-fe2edc3479b9
+
+	column CUSTOMER_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: f5c855f0-bbc8-4619-8af9-4821b34c72da
+		summarizeBy: none
+		sourceColumn: CUSTOMER_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CUSTOMER_NAME
+		dataType: string
+		lineageTag: 1a4ec823-af84-4d3e-ab42-67648077af65
+		summarizeBy: none
+		sourceColumn: CUSTOMER_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column CUSTOMER_ADDRESS
+		dataType: string
+		lineageTag: e9f205e0-8818-42a6-bbec-6e85bf831ffb
+		summarizeBy: none
+		sourceColumn: CUSTOMER_ADDRESS
+
+		annotation SummarizationSetBy = Automatic
+
+	column CUSTOMER_PHONE
+		dataType: string
+		lineageTag: e99d9f98-462f-4f93-aa92-b4a473e351b1
+		summarizeBy: none
+		sourceColumn: CUSTOMER_PHONE
+
+		annotation SummarizationSetBy = Automatic
+
+	column ACCOUNT_BALANCE
+		dataType: int64
+		formatString: 0
+		lineageTag: 4e02f05a-107f-491f-b674-f3a2be211d6f
+		summarizeBy: none
+		sourceColumn: ACCOUNT_BALANCE
+
+		annotation SummarizationSetBy = Automatic
+
+	column MARKET_SEGMENT
+		dataType: string
+		lineageTag: f5649861-1c7f-4594-81a8-8db3a19109ba
+		summarizeBy: none
+		sourceColumn: MARKET_SEGMENT
+
+		annotation SummarizationSetBy = Automatic
+
+	column NATION_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: e30bcf46-986c-4168-8a6b-584c7fb332bc
+		summarizeBy: none
+		sourceColumn: NATION_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column NATION_NAME
+		dataType: string
+		lineageTag: 2355baa9-214e-4e39-b720-be626595787c
+		summarizeBy: none
+		sourceColumn: NATION_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column REGION_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: f6332f2a-86e5-4978-ad9d-f214cb88f678
+		summarizeBy: none
+		sourceColumn: REGION_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column REGION_NAME
+		dataType: string
+		lineageTag: ee651490-c222-41ac-94b7-3a78089ba7d6
+		summarizeBy: none
+		sourceColumn: REGION_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	partition gold_dim_customer = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents("C:\Users\A200256158\Downloads\gold_dim_customer.csv"),[Delimiter=",", Columns=10, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Encabezados promovidos" = Table.PromoteHeaders(Origen, [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"CUSTOMER_ID", Int64.Type}, {"CUSTOMER_NAME", type text}, {"CUSTOMER_ADDRESS", type text}, {"CUSTOMER_PHONE", type text}, {"ACCOUNT_BALANCE", Int64.Type}, {"MARKET_SEGMENT", type text}, {"NATION_ID", Int64.Type}, {"NATION_NAME", type text}, {"REGION_ID", Int64.Type}, {"REGION_NAME", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
