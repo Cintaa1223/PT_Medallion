@@ -2,23 +2,57 @@ version: 2
 
 models:
   - name: silver_customer
+    description: "Cleansed customer dimension staging model. Renames cryptic TPC-H columns (c_*) into business-friendly names, trims text fields, and deduplicates by customer_id."
     columns:
       - name: customer_id
+        description: "Unique identifier for the customer. Primary key of this model."
         tests:
           - unique
           - not_null
+      - name: customer_name
+        description: "Customer's full name."
+      - name: customer_address
+        description: "Customer's postal address."
+      - name: nation_id
+        description: "Foreign key to silver_nation.nation_id."
+      - name: customer_phone
+        description: "Customer's phone number."
+      - name: account_balance
+        description: "Customer's account balance in the TPC-H benchmark currency."
+      - name: market_segment
+        description: "Market segment the customer belongs to (e.g. AUTOMOBILE, BUILDING, FURNITURE, MACHINERY, HOUSEHOLD). Primary slicing dimension for the Gold profitability use case."
+      - name: customer_comment
+        description: "Free-text comment field from the source system."
 
   - name: silver_orders
+    description: "Cleansed orders staging model. Standardizes order status codes into readable labels and deduplicates by order_id."
     columns:
       - name: order_id
+        description: "Unique identifier for the order. Primary key of this model."
         tests:
           - unique
           - not_null
       - name: customer_id
+        description: "Foreign key to silver_customer.customer_id."
         tests:
           - not_null
+      - name: order_date
+        description: "Date the order was placed."
+      - name: order_total_price
+        description: "Total price of the order as recorded at order time."
+      - name: order_status
+        description: "Human-readable order status: Open, Fulfilled, Pending, or Unknown. Standardized from the raw single-character TPC-H code."
+      - name: order_priority
+        description: "Priority level assigned to the order."
+      - name: clerk
+        description: "Clerk who processed the order."
+      - name: ship_priority
+        description: "Shipping priority code."
+      - name: order_comment
+        description: "Free-text comment field from the source system."
 
   - name: silver_lineitem
+    description: "Cleansed line-item staging model, the most granular sales record in TPC-H. Calculates net and gross revenue after discount and tax, filters invalid quantities, and enforces uniqueness on the composite natural key (order_id, line_number)."
     tests:
       - unique_combination_of_columns:
           arguments:
@@ -27,22 +61,64 @@ models:
               - line_number
     columns:
       - name: order_id
+        description: "Foreign key to silver_orders.order_id. Part of the composite primary key together with line_number."
         tests:
           - not_null
       - name: line_number
+        description: "Sequential line number within the order. Part of the composite primary key together with order_id."
         tests:
           - not_null
+      - name: part_id
+        description: "Foreign key to the part sold on this line."
+      - name: supplier_id
+        description: "Foreign key to the supplier fulfilling this line."
+      - name: quantity
+        description: "Quantity of the part ordered on this line."
+      - name: extended_price
+        description: "Price of the line before discount and tax."
+      - name: discount
+        description: "Discount rate applied to this line, expressed as a decimal."
+      - name: tax
+        description: "Tax rate applied to this line, expressed as a decimal."
+      - name: net_revenue
+        description: "Revenue after discount, before tax: extended_price * (1 - discount). Core profitability metric used throughout the Gold layer."
+      - name: gross_revenue
+        description: "Revenue after discount and tax: extended_price * (1 - discount) * (1 + tax)."
+      - name: ship_date
+        description: "Date the line was shipped."
+      - name: commit_date
+        description: "Date the supplier committed to shipping the line."
+      - name: receipt_date
+        description: "Date the customer received the line."
+      - name: return_flag
+        description: "Indicates whether the line item was returned."
+      - name: line_status
+        description: "Status of the line item (fulfilled or open)."
 
   - name: silver_nation
+    description: "Conformed geography dimension staging model. Joins nation to region so downstream models get both attributes without an extra join."
     columns:
       - name: nation_id
+        description: "Unique identifier for the nation. Primary key of this model."
         tests:
           - unique
           - not_null
+      - name: nation_name
+        description: "Name of the nation."
+      - name: region_id
+        description: "Foreign key to silver_region.region_id."
+      - name: region_name
+        description: "Name of the region the nation belongs to."
 
   - name: silver_region
+    description: "Cleansed region staging model. One row per world region (AFRICA, AMERICA, ASIA, EUROPE, MIDDLE EAST in TPC-H)."
     columns:
       - name: region_id
+        description: "Unique identifier for the region. Primary key of this model."
         tests:
           - unique
           - not_null
+      - name: region_name
+        description: "Name of the region."
+      - name: region_comment
+        description: "Free-text comment field from the source system."

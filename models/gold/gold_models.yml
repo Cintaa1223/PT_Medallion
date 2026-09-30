@@ -2,20 +2,57 @@ version: 2
 
 models:
   - name: gold_dim_customer
+    description: "Customer dimension for the profitability-by-customer-and-market-segment analytical model. Enriches silver_customer with nation and region attributes for direct use in BI filters and slicers."
     columns:
       - name: customer_id
+        description: "Unique identifier for the customer. Primary key of this dimension, referenced by gold_fact_sales.customer_id."
         tests:
           - unique
           - not_null
+      - name: customer_name
+        description: "Customer's full name."
+      - name: customer_address
+        description: "Customer's postal address."
+      - name: customer_phone
+        description: "Customer's phone number."
+      - name: account_balance
+        description: "Customer's account balance."
+      - name: market_segment
+        description: "Market segment the customer belongs to. Primary slicing attribute for profitability analysis."
+      - name: nation_id
+        description: "Identifier of the customer's nation."
+      - name: nation_name
+        description: "Name of the customer's nation."
+      - name: region_id
+        description: "Identifier of the customer's region."
+      - name: region_name
+        description: "Name of the customer's region."
 
   - name: gold_dim_date
+    description: "Generated date dimension covering the full TPC-H order date range (1992-1998), one row per calendar day. Not sourced from any TPC-H table — built with a date spine to guarantee full time-hierarchy support (year/quarter/month/day) in Power BI, including days with no recorded sales."
     columns:
       - name: date_id
+        description: "Calendar date. Primary key of this dimension, referenced by gold_fact_sales.date_id."
         tests:
           - unique
           - not_null
+      - name: year
+        description: "Calendar year."
+      - name: quarter
+        description: "Calendar quarter (1-4)."
+      - name: month
+        description: "Calendar month number (1-12)."
+      - name: month_name
+        description: "Full month name."
+      - name: day_of_month
+        description: "Day of the month (1-31)."
+      - name: day_of_week
+        description: "Day of the week as a number."
+      - name: day_name
+        description: "Full day-of-week name."
 
   - name: gold_fact_sales
+    description: "Line-item grain fact table for the customer/market-segment profitability use case. One row per order line, joined to its order to bring in customer_id and order_date. Consumption-ready for Power BI without further transformation."
     tests:
       - unique_combination_of_columns:
           arguments:
@@ -23,7 +60,12 @@ models:
               - order_id
               - line_number
     columns:
+      - name: order_id
+        description: "Identifier of the order this line belongs to. Part of the composite grain together with line_number."
+      - name: line_number
+        description: "Sequential line number within the order. Part of the composite grain together with order_id."
       - name: customer_id
+        description: "Foreign key to gold_dim_customer.customer_id."
         tests:
           - not_null
           - relationships:
@@ -31,9 +73,30 @@ models:
                 to: ref('gold_dim_customer')
                 field: customer_id
       - name: date_id
+        description: "Foreign key to gold_dim_date.date_id, populated from the order date."
         tests:
           - not_null
           - relationships:
               arguments:
                 to: ref('gold_dim_date')
                 field: date_id
+      - name: part_id
+        description: "Identifier of the part sold on this line."
+      - name: supplier_id
+        description: "Identifier of the supplier fulfilling this line."
+      - name: quantity
+        description: "Quantity of the part sold on this line."
+      - name: extended_price
+        description: "Price of the line before discount and tax."
+      - name: discount
+        description: "Discount rate applied to this line."
+      - name: tax
+        description: "Tax rate applied to this line."
+      - name: net_revenue
+        description: "Revenue after discount, before tax. Primary revenue metric for the profitability dashboard."
+      - name: gross_revenue
+        description: "Revenue after discount and tax."
+      - name: return_flag
+        description: "Indicates whether the line item was returned."
+      - name: line_status
+        description: "Status of the line item (fulfilled or open)."
